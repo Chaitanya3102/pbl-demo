@@ -23,19 +23,19 @@ let curr_track = document.createElement('audio');
 let track_list = [{
         name: "Excuses",
         artist: "AP Dhillon",
-        image: "https://github.com/GHOSTYOP/pbl-demo/blob/main/images/excuses.jpg",
+        image: "https://a10.gaanacdn.com/images/albums/4/4729504/crop_480x480_4729504.jpg",
         path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Excuses%20-%20Ap%20Dhillon.mp3"
     },
     {
         name: "Sahara",
         artist: "Hensonn",
-        image: "https://github.com/GHOSTYOP/pbl-demo/blob/main/images/sahara.jpg",
+        image: "https://i1.sndcdn.com/artworks-p3x7gn5Qpy5iCZJY-PsSTNQ-t500x500.jpg",
         path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Sahara%20(320%20kbps).mp3"
     },
     {
         name: "OverWhelmed",
         artist: "Ryan Mack",
-        image: "https://github.com/GHOSTYOP/pbl-demo/blob/main/images/overwhelmed.jpg",
+        image: "https://i.scdn.co/image/ab67616d0000b273df62a79e3efd9e3438ce70ed",
         path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Overwhelmed%2BRyan%2BMack%2BRemix.mp3",
     },
 ];
