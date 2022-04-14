@@ -1,145 +1,178 @@
-let now_playing = document.querySelector(".now-playing");
-let track_art = document.querySelector(".track-art");
-let track_name = document.querySelector(".track-name");
-let track_artist = document.querySelector(".track-artist");
+const musicContainer = document.getElementById('music-container');
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
 
-let playpause_btn = document.querySelector(".playpause-track");
-let next_btn = document.querySelector(".next-track");
-let prev_btn = document.querySelector(".prev-track");
+const audio = document.getElementById('audio');
+const progress = document.getElementById('progress');
+const progressContainer = document.getElementById('progress-container');
+const title = document.getElementById('title');
+const cover = document.getElementById('cover');
+const currTime = document.querySelector('#currTime');
+const durTime = document.querySelector('#durTime');
 
-let seek_slider = document.querySelector(".seek_slider");
-let volume_slider = document.querySelector(".volume_slider");
-let curr_time = document.querySelector(".current-time");
-let total_duration = document.querySelector(".total-duration");
+// Song titles
+const songs = ['hey', 'summer', 'ukulele'];
 
-let track_index = 0;
-let isPlaying = false;
-let updateTimer;
+// Keep track of song
+let songIndex = 2;
 
-// Create new audio element
-let curr_track = document.createElement('audio');
+// Initially load song details into DOM
+loadSong(songs[songIndex]);
 
-// Define the tracks that have to be played
-let track_list = [{
-        name: "Excuses",
-        artist: "AP Dhillon",
-        image: "https://a10.gaanacdn.com/images/albums/4/4729504/crop_480x480_4729504.jpg",
-        path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Excuses%20-%20Ap%20Dhillon.mp3"
-    },
-    {
-        name: "Sahara",
-        artist: "Hensonn",
-        image: "https://i1.sndcdn.com/artworks-p3x7gn5Qpy5iCZJY-PsSTNQ-t500x500.jpg",
-        path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Sahara%20(320%20kbps).mp3"
-    },
-    {
-        name: "OverWhelmed",
-        artist: "Ryan Mack",
-        image: "https://i.scdn.co/image/ab67616d0000b273df62a79e3efd9e3438ce70ed",
-        path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Overwhelmed%2BRyan%2BMack%2BRemix.mp3",
-    },
-];
-
-function random_bg_color() {
-
-    // Get a number between 64 to 256 (for getting lighter colors)
-    let red = Math.floor(Math.random() * 256) + 64;
-    let green = Math.floor(Math.random() * 256) + 64;
-    let blue = Math.floor(Math.random() * 256) + 64;
-
-    // Construct a color withe the given values
-    let bgColor = "rgb(" + red + "," + green + "," + blue + ")";
-
-    // Set the background to that color
-    document.body.style.background = bgColor;
+// Update song details
+function loadSong(song) {
+    title.innerText = song;
+    audio.src = `music/${song}.mp3`;
+    cover.src = `images/${song}.jpg`;
 }
 
-function loadTrack(track_index) {
-    clearInterval(updateTimer);
-    resetValues();
-    curr_track.src = track_list[track_index].path;
-    curr_track.load();
+// Play song
+function playSong() {
+    musicContainer.classList.add('play');
+    playBtn.querySelector('i.fas').classList.remove('fa-play');
+    playBtn.querySelector('i.fas').classList.add('fa-pause');
 
-    track_art.style.backgroundImage = "url(" + track_list[track_index].image + ")";
-    track_name.textContent = track_list[track_index].name;
-    track_artist.textContent = track_list[track_index].artist;
-    now_playing.textContent = "PLAYING " + (track_index + 1) + " OF " + track_list.length;
-
-    updateTimer = setInterval(seekUpdate, 1000);
-    curr_track.addEventListener("ended", nextTrack);
-    random_bg_color();
+    audio.play();
 }
 
-function resetValues() {
-    curr_time.textContent = "00:00";
-    total_duration.textContent = "00:00";
-    seek_slider.value = 0;
+// Pause song
+function pauseSong() {
+    musicContainer.classList.remove('play');
+    playBtn.querySelector('i.fas').classList.add('fa-play');
+    playBtn.querySelector('i.fas').classList.remove('fa-pause');
+
+    audio.pause();
 }
 
-// Load the first track in the tracklist
-loadTrack(track_index);
+// Previous song
+function prevSong() {
+    songIndex--;
 
-function playpauseTrack() {
-    if (!isPlaying) playTrack();
-    else pauseTrack();
-}
-
-function playTrack() {
-    curr_track.play();
-    isPlaying = true;
-    playpause_btn.innerHTML = '<i class="fa fa-pause-circle fa-5x"></i>';
-}
-
-function pauseTrack() {
-    curr_track.pause();
-    isPlaying = false;
-    playpause_btn.innerHTML = '<i class="fa fa-play-circle fa-5x"></i>';;
-}
-
-function nextTrack() {
-    if (track_index < track_list.length - 1)
-        track_index += 1;
-    else track_index = 0;
-    loadTrack(track_index);
-    playTrack();
-}
-
-function prevTrack() {
-    if (track_index > 0)
-        track_index -= 1;
-    else track_index = track_list.length;
-    loadTrack(track_index);
-    playTrack();
-}
-
-function seekTo() {
-    let seekto = curr_track.duration * (seek_slider.value / 100);
-    curr_track.currentTime = seekto;
-}
-
-function setVolume() {
-    curr_track.volume = volume_slider.value / 100;
-}
-
-function seekUpdate() {
-    let seekPosition = 0;
-
-    if (!isNaN(curr_track.duration)) {
-        seekPosition = curr_track.currentTime * (100 / curr_track.duration);
-
-        seek_slider.value = seekPosition;
-
-        let currentMinutes = Math.floor(curr_track.currentTime / 60);
-        let currentSeconds = Math.floor(curr_track.currentTime - currentMinutes * 60);
-        let durationMinutes = Math.floor(curr_track.duration / 60);
-        let durationSeconds = Math.floor(curr_track.duration - durationMinutes * 60);
-
-        if (currentSeconds < 10) { currentSeconds = "0" + currentSeconds; }
-        if (durationSeconds < 10) { durationSeconds = "0" + durationSeconds; }
-        if (currentMinutes < 10) { currentMinutes = "0" + currentMinutes; }
-        if (durationMinutes < 10) { durationMinutes = "0" + durationMinutes; }
-
-        curr_time.textContent = currentMinutes + ":" + currentSeconds;
-        total_duration.textContent = durationMinutes + ":" + durationSeconds;
+    if (songIndex < 0) {
+        songIndex = songs.length - 1;
     }
+
+    loadSong(songs[songIndex]);
+
+    playSong();
 }
+
+// Next song
+function nextSong() {
+    songIndex++;
+
+    if (songIndex > songs.length - 1) {
+        songIndex = 0;
+    }
+
+    loadSong(songs[songIndex]);
+
+    playSong();
+}
+
+// Update progress bar
+function updateProgress(e) {
+    const { duration, currentTime } = e.srcElement;
+    const progressPercent = (currentTime / duration) * 100;
+    progress.style.width = `${progressPercent}%`;
+}
+
+// Set progress bar
+function setProgress(e) {
+    const width = this.clientWidth;
+    const clickX = e.offsetX;
+    const duration = audio.duration;
+
+    audio.currentTime = (clickX / width) * duration;
+}
+
+//get duration & currentTime for Time of song
+function DurTime(e) {
+    const { duration, currentTime } = e.srcElement;
+    var sec;
+    var sec_d;
+
+    // define minutes currentTime
+    let min = (currentTime == null) ? 0 :
+        Math.floor(currentTime / 60);
+    min = min < 10 ? '0' + min : min;
+
+    // define seconds currentTime
+    function get_sec(x) {
+        if (Math.floor(x) >= 60) {
+
+            for (var i = 1; i <= 60; i++) {
+                if (Math.floor(x) >= (60 * i) && Math.floor(x) < (60 * (i + 1))) {
+                    sec = Math.floor(x) - (60 * i);
+                    sec = sec < 10 ? '0' + sec : sec;
+                }
+            }
+        } else {
+            sec = Math.floor(x);
+            sec = sec < 10 ? '0' + sec : sec;
+        }
+    }
+
+    get_sec(currentTime, sec);
+
+    // change currentTime DOM
+    currTime.innerHTML = min + ':' + sec;
+
+    // define minutes duration
+    let min_d = (isNaN(duration) === true) ? '0' :
+        Math.floor(duration / 60);
+    min_d = min_d < 10 ? '0' + min_d : min_d;
+
+
+    function get_sec_d(x) {
+        if (Math.floor(x) >= 60) {
+
+            for (var i = 1; i <= 60; i++) {
+                if (Math.floor(x) >= (60 * i) && Math.floor(x) < (60 * (i + 1))) {
+                    sec_d = Math.floor(x) - (60 * i);
+                    sec_d = sec_d < 10 ? '0' + sec_d : sec_d;
+                }
+            }
+        } else {
+            sec_d = (isNaN(duration) === true) ? '0' :
+                Math.floor(x);
+            sec_d = sec_d < 10 ? '0' + sec_d : sec_d;
+        }
+    }
+
+    // define seconds duration
+
+    get_sec_d(duration);
+
+    // change duration DOM
+    durTime.innerHTML = min_d + ':' + sec_d;
+
+};
+
+// Event listeners
+playBtn.addEventListener('click', () => {
+    const isPlaying = musicContainer.classList.contains('play');
+
+    if (isPlaying) {
+        pauseSong();
+    } else {
+        playSong();
+    }
+});
+
+// Change song
+prevBtn.addEventListener('click', prevSong);
+nextBtn.addEventListener('click', nextSong);
+
+// Time/song update
+audio.addEventListener('timeupdate', updateProgress);
+
+// Click on progress bar
+progressContainer.addEventListener('click', setProgress);
+
+// Song ends
+audio.addEventListener('ended', nextSong);
+
+// Time of song
+audio.addEventListener('timeupdate', DurTime);
