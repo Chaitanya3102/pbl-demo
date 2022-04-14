@@ -1,178 +1,145 @@
-const musicContainer = document.getElementById('music-container');
-const playBtn = document.getElementById('play');
-const prevBtn = document.getElementById('prev');
-const nextBtn = document.getElementById('next');
+let now_playing = document.querySelector(".now-playing");
+let track_art = document.querySelector(".track-art");
+let track_name = document.querySelector(".track-name");
+let track_artist = document.querySelector(".track-artist");
 
-const audio = document.getElementById('audio');
-const progress = document.getElementById('progress');
-const progressContainer = document.getElementById('progress-container');
-const title = document.getElementById('title');
-const cover = document.getElementById('cover');
-const currTime = document.querySelector('#currTime');
-const durTime = document.querySelector('#durTime');
+let playpause_btn = document.querySelector(".playpause-track");
+let next_btn = document.querySelector(".next-track");
+let prev_btn = document.querySelector(".prev-track");
 
-// Song titles
-const songs = ['hey', 'summer', 'ukulele'];
+let seek_slider = document.querySelector(".seek_slider");
+let volume_slider = document.querySelector(".volume_slider");
+let curr_time = document.querySelector(".current-time");
+let total_duration = document.querySelector(".total-duration");
 
-// Keep track of song
-let songIndex = 2;
+let track_index = 0;
+let isPlaying = false;
+let updateTimer;
 
-// Initially load song details into DOM
-loadSong(songs[songIndex]);
+// Create new audio element
+let curr_track = document.createElement('audio');
 
-// Update song details
-function loadSong(song) {
-    title.innerText = song;
-    audio.src = `music/${song}.mp3`;
-    cover.src = `images/${song}.jpg`;
+// Define the tracks that have to be played
+let track_list = [{
+        name: "Night Owl",
+        artist: "Broke For Free",
+        image: "https://images.pexels.com/photos/2264753/pexels-photo-2264753.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
+        path: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Broke_For_Free/Directionless_EP/Broke_For_Free_-_01_-_Night_Owl.mp3"
+    },
+    {
+        name: "Enthusiast",
+        artist: "Tours",
+        image: "https://images.pexels.com/photos/3100835/pexels-photo-3100835.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
+        path: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3"
+    },
+    {
+        name: "Shipping Lanes",
+        artist: "Chad Crouch",
+        image: "https://images.pexels.com/photos/1717969/pexels-photo-1717969.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
+        path: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+    },
+];
+
+function random_bg_color() {
+
+    // Get a number between 64 to 256 (for getting lighter colors)
+    let red = Math.floor(Math.random() * 256) + 64;
+    let green = Math.floor(Math.random() * 256) + 64;
+    let blue = Math.floor(Math.random() * 256) + 64;
+
+    // Construct a color withe the given values
+    let bgColor = "rgb(" + red + "," + green + "," + blue + ")";
+
+    // Set the background to that color
+    document.body.style.background = bgColor;
 }
 
-// Play song
-function playSong() {
-    musicContainer.classList.add('play');
-    playBtn.querySelector('i.fas').classList.remove('fa-play');
-    playBtn.querySelector('i.fas').classList.add('fa-pause');
+function loadTrack(track_index) {
+    clearInterval(updateTimer);
+    resetValues();
+    curr_track.src = track_list[track_index].path;
+    curr_track.load();
 
-    audio.play();
+    track_art.style.backgroundImage = "url(" + track_list[track_index].image + ")";
+    track_name.textContent = track_list[track_index].name;
+    track_artist.textContent = track_list[track_index].artist;
+    now_playing.textContent = "PLAYING " + (track_index + 1) + " OF " + track_list.length;
+
+    updateTimer = setInterval(seekUpdate, 1000);
+    curr_track.addEventListener("ended", nextTrack);
+    random_bg_color();
 }
 
-// Pause song
-function pauseSong() {
-    musicContainer.classList.remove('play');
-    playBtn.querySelector('i.fas').classList.add('fa-play');
-    playBtn.querySelector('i.fas').classList.remove('fa-pause');
-
-    audio.pause();
+function resetValues() {
+    curr_time.textContent = "00:00";
+    total_duration.textContent = "00:00";
+    seek_slider.value = 0;
 }
 
-// Previous song
-function prevSong() {
-    songIndex--;
+// Load the first track in the tracklist
+loadTrack(track_index);
 
-    if (songIndex < 0) {
-        songIndex = songs.length - 1;
+function playpauseTrack() {
+    if (!isPlaying) playTrack();
+    else pauseTrack();
+}
+
+function playTrack() {
+    curr_track.play();
+    isPlaying = true;
+    playpause_btn.innerHTML = '<i class="fa fa-pause-circle fa-5x"></i>';
+}
+
+function pauseTrack() {
+    curr_track.pause();
+    isPlaying = false;
+    playpause_btn.innerHTML = '<i class="fa fa-play-circle fa-5x"></i>';;
+}
+
+function nextTrack() {
+    if (track_index < track_list.length - 1)
+        track_index += 1;
+    else track_index = 0;
+    loadTrack(track_index);
+    playTrack();
+}
+
+function prevTrack() {
+    if (track_index > 0)
+        track_index -= 1;
+    else track_index = track_list.length;
+    loadTrack(track_index);
+    playTrack();
+}
+
+function seekTo() {
+    let seekto = curr_track.duration * (seek_slider.value / 100);
+    curr_track.currentTime = seekto;
+}
+
+function setVolume() {
+    curr_track.volume = volume_slider.value / 100;
+}
+
+function seekUpdate() {
+    let seekPosition = 0;
+
+    if (!isNaN(curr_track.duration)) {
+        seekPosition = curr_track.currentTime * (100 / curr_track.duration);
+
+        seek_slider.value = seekPosition;
+
+        let currentMinutes = Math.floor(curr_track.currentTime / 60);
+        let currentSeconds = Math.floor(curr_track.currentTime - currentMinutes * 60);
+        let durationMinutes = Math.floor(curr_track.duration / 60);
+        let durationSeconds = Math.floor(curr_track.duration - durationMinutes * 60);
+
+        if (currentSeconds < 10) { currentSeconds = "0" + currentSeconds; }
+        if (durationSeconds < 10) { durationSeconds = "0" + durationSeconds; }
+        if (currentMinutes < 10) { currentMinutes = "0" + currentMinutes; }
+        if (durationMinutes < 10) { durationMinutes = "0" + durationMinutes; }
+
+        curr_time.textContent = currentMinutes + ":" + currentSeconds;
+        total_duration.textContent = durationMinutes + ":" + durationSeconds;
     }
-
-    loadSong(songs[songIndex]);
-
-    playSong();
 }
-
-// Next song
-function nextSong() {
-    songIndex++;
-
-    if (songIndex > songs.length - 1) {
-        songIndex = 0;
-    }
-
-    loadSong(songs[songIndex]);
-
-    playSong();
-}
-
-// Update progress bar
-function updateProgress(e) {
-    const { duration, currentTime } = e.srcElement;
-    const progressPercent = (currentTime / duration) * 100;
-    progress.style.width = `${progressPercent}%`;
-}
-
-// Set progress bar
-function setProgress(e) {
-    const width = this.clientWidth;
-    const clickX = e.offsetX;
-    const duration = audio.duration;
-
-    audio.currentTime = (clickX / width) * duration;
-}
-
-//get duration & currentTime for Time of song
-function DurTime(e) {
-    const { duration, currentTime } = e.srcElement;
-    var sec;
-    var sec_d;
-
-    // define minutes currentTime
-    let min = (currentTime == null) ? 0 :
-        Math.floor(currentTime / 60);
-    min = min < 10 ? '0' + min : min;
-
-    // define seconds currentTime
-    function get_sec(x) {
-        if (Math.floor(x) >= 60) {
-
-            for (var i = 1; i <= 60; i++) {
-                if (Math.floor(x) >= (60 * i) && Math.floor(x) < (60 * (i + 1))) {
-                    sec = Math.floor(x) - (60 * i);
-                    sec = sec < 10 ? '0' + sec : sec;
-                }
-            }
-        } else {
-            sec = Math.floor(x);
-            sec = sec < 10 ? '0' + sec : sec;
-        }
-    }
-
-    get_sec(currentTime, sec);
-
-    // change currentTime DOM
-    currTime.innerHTML = min + ':' + sec;
-
-    // define minutes duration
-    let min_d = (isNaN(duration) === true) ? '0' :
-        Math.floor(duration / 60);
-    min_d = min_d < 10 ? '0' + min_d : min_d;
-
-
-    function get_sec_d(x) {
-        if (Math.floor(x) >= 60) {
-
-            for (var i = 1; i <= 60; i++) {
-                if (Math.floor(x) >= (60 * i) && Math.floor(x) < (60 * (i + 1))) {
-                    sec_d = Math.floor(x) - (60 * i);
-                    sec_d = sec_d < 10 ? '0' + sec_d : sec_d;
-                }
-            }
-        } else {
-            sec_d = (isNaN(duration) === true) ? '0' :
-                Math.floor(x);
-            sec_d = sec_d < 10 ? '0' + sec_d : sec_d;
-        }
-    }
-
-    // define seconds duration
-
-    get_sec_d(duration);
-
-    // change duration DOM
-    durTime.innerHTML = min_d + ':' + sec_d;
-
-};
-
-// Event listeners
-playBtn.addEventListener('click', () => {
-    const isPlaying = musicContainer.classList.contains('play');
-
-    if (isPlaying) {
-        pauseSong();
-    } else {
-        playSong();
-    }
-});
-
-// Change song
-prevBtn.addEventListener('click', prevSong);
-nextBtn.addEventListener('click', nextSong);
-
-// Time/song update
-audio.addEventListener('timeupdate', updateProgress);
-
-// Click on progress bar
-progressContainer.addEventListener('click', setProgress);
-
-// Song ends
-audio.addEventListener('ended', nextSong);
-
-// Time of song
-audio.addEventListener('timeupdate', DurTime);
