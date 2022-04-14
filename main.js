@@ -21,22 +21,22 @@ let curr_track = document.createElement('audio');
 
 // Define the tracks that have to be played
 let track_list = [{
-        name: "Night Owl",
-        artist: "Broke For Free",
-        image: "https://images.pexels.com/photos/2264753/pexels-photo-2264753.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
-        path: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Broke_For_Free/Directionless_EP/Broke_For_Free_-_01_-_Night_Owl.mp3"
+        name: "Excuses",
+        artist: "AP Dhillon",
+        image: "https://github.com/GHOSTYOP/pbl-demo/blob/main/images/excuses.jpg",
+        path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Excuses%20-%20Ap%20Dhillon.mp3"
     },
     {
-        name: "Enthusiast",
-        artist: "Tours",
-        image: "https://images.pexels.com/photos/3100835/pexels-photo-3100835.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
-        path: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3"
+        name: "Sahara",
+        artist: "Hensonn",
+        image: "https://github.com/GHOSTYOP/pbl-demo/blob/main/images/sahara.jpg",
+        path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Sahara%20(320%20kbps).mp3"
     },
     {
-        name: "Shipping Lanes",
-        artist: "Chad Crouch",
-        image: "https://images.pexels.com/photos/1717969/pexels-photo-1717969.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
-        path: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+        name: "OverWhelmed",
+        artist: "Ryan Mack",
+        image: "https://github.com/GHOSTYOP/pbl-demo/blob/main/images/overwhelmed.jpg",
+        path: "https://github.com/GHOSTYOP/pbl-demo/blob/main/music/Overwhelmed%2BRyan%2BMack%2BRemix.mp3",
     },
 ];
 
